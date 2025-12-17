@@ -24,6 +24,7 @@ const ALLOWED_ORIGINS = new Set([
   "http://localhost:3000",
   "http://localhost:3001",
   "https://velorakadingiyim.vercel.app",
+  "https://illustrious-cendol-8fe0cb.netlify.app",
 ]);
 
 function corsHeaders(req: NextRequest) {
