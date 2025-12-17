@@ -25,12 +25,9 @@ export async function OPTIONS() {
 /* =========================
    GET – Product Detail
 ========================= */
-export async function GET(
-  _req: Request,
-  { params }: { params: { slug: string } }
-) {
+export async function GET(_req: Request, context: any) {
   try {
-    const { slug } = params;
+    const { slug } = context.params;
 
     if (!slug) {
       return NextResponse.json(
