@@ -1,0 +1,197 @@
+@import "tailwindcss";
+
+:root {
+  --color-background: #f9f6f2;
+  --color-foreground: #2d2d2d;
+  --color-primary: #b39b4c;
+  --color-secondary: #ffffff;
+  --color-accent: #d4af7f;
+  --color-muted: #7a6a5b;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-background: #0a0a0a;
+    --color-foreground: #ededed;
+    --color-primary: #b39b4c;
+    --color-secondary: #1a1a1a;
+    --color-accent: #d4af7f;
+    --color-muted: #b0b0b0;
+  }
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
+  line-height: 1.5;
+}
+
+a {
+  color: var(--color-foreground);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--color-primary);
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border-radius: 6px;
+  border: none;
+  padding: 0.5rem 1rem;
+  background-color: var(--color-primary);
+  color: #fff;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+button:hover {
+  background-color: var(--color-accent);
+  transform: translateY(-2px);
+}
+
+.container {
+  width: 90%;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.card {
+  background-color: var(--color-secondary);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+header {
+  background-color: var(--color-background);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+footer {
+  background-color: var(--color-secondary);
+  padding: 2rem 0;
+  text-align: center;
+  color: var(--color-muted);
+}
+
+@media (max-width: 768px) {
+  .container {
+    width: 95%;
+  }
+}
+
+.white-outline-btn {
+  width: 100%;
+  background: #fff !important;
+  border: 2px solid #f6c400 !important;
+  color: #000 !important;
+  padding: 14px 0 !important;
+  font-size: 15px !important;
+  font-weight: 600;
+  border-radius: 0 !important;
+  transition: all 0.25s ease !important;
+}
+
+.white-outline-btn:hover {
+  background: #f6c400 !important;
+  color: #000 !important;
+}
+
+.size-btn {
+  width: 64px;
+  height: 48px;
+  font-size: 15px;
+  background: #fff !important;
+  border: 2px solid #f6c400 !important;
+  color: #000 !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.25s ease !important;
+}
+
+.size-btn:hover {
+  background: #f6c400 !important;
+}
+
+.size-btn.selected {
+  background: #f6c400 !important;
+  border-color: #f6c400 !important;
+  font-weight: 600;
+}
+
+.favorite-btn {
+  width: 52px;
+  height: 52px;
+  border: 2px solid #000 !important;
+  background: #fff !important;
+  color: #000 !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 0 !important;
+  transition: all 0.25s ease !important;
+}
+
+.favorite-btn:hover {
+  background: #f6c400 !important;
+  border-color: #f6c400 !important;
+}
+
+.accordion-header {
+  width: 100%;
+  background: #fff !important;
+  border: 2px solid #f6c400 !important;
+  color: #000 !important;
+  padding: 14px 16px !important;
+  font-size: 15px;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.25s ease !important;
+  border-radius: 0 !important;
+}
+
+.accordion-header:hover {
+  background: #f6c400 !important;
+  color: #000 !important;
+  border-color: #f6c400 !important;
+}
+
+.accordion-header.open {
+  background: #f6c400 !important;
+  color: #000 !important;
+  border-color: #f6c400 !important;
+}
+
+.accordion-header .text-xl,
+.accordion-header span {
+  color: inherit !important;
+  transition: all 0.25s ease;
+}
+
+.accordion-content {
+  padding: 14px 0 20px !important;
+  font-size: 15px;
+  color: #444;
+  line-height: 1.6;
+  background: none !important;
+  border: none !important;
+  border-radius: 0 !important;
+}
