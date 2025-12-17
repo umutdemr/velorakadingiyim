@@ -68,7 +68,7 @@ const SidebarLayout = () => {
                   </Button> */}
                 </div>
                 <div className="lg:w-1/2 w-full -mt-4 ml-4 scale-[1] shrink-0">
-                  <Image src={rocket} alt="rocket" />
+                  {/* <Image src={rocket} alt="rocket" /> */}
                 </div>
               </div>
             </div>

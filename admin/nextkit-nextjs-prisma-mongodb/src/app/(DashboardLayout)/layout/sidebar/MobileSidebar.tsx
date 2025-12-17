@@ -69,7 +69,7 @@ const MobileSidebar = () => {
                   </Button>
                 </div>
                 <div className="lg:w-1/2 w-full -mt-4 ml-[26px] scale-[1.2] shrink-0">
-                  <Image src={rocket} alt="rocket" />
+                  {/* <Image src={rocket} alt="rocket" /> */}
                 </div>
               </div>
             </div>
