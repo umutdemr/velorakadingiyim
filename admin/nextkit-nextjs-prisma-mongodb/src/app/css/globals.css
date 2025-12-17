@@ -2,13 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
-
-
-@import './layouts/container.css';
-@import './layouts/sidebar.css';
-@import './layouts/header.css';
-@import './theme/default-colors.css';
-@import './override/reboot.css';
+@import url("./layouts/container.css");
+@import url("./layouts/sidebar.css");
+@import url("./layouts/header.css");
+@import url("./theme/default-colors.css");
+@import url("./override/reboot.css");
 
 @layer components {
   .container {
@@ -28,11 +26,11 @@
   }
 
   .card-title {
-    @apply text-lg font-semibold text-dark dark:text-white
+    @apply text-lg font-semibold text-dark dark:text-white;
   }
 
   .card-subtitle {
-    @apply text-sm dark:text-darklink font-medium
+    @apply text-sm dark:text-darklink font-medium;
   }
 
   body {
@@ -49,13 +47,12 @@
     @apply text-dark dark:text-white font-semibold;
   }
 
-
   .border-ld {
     @apply border-border dark:border-darkborder;
   }
 
   .bg-hover {
-    @apply hover:bg-lightgray
+    @apply hover:bg-lightgray;
   }
 
   .form-control input {
@@ -113,17 +110,15 @@
   }
 
   .form-rounded input {
-    @apply rounded-full
+    @apply rounded-full;
   }
-
 
   .input-center input {
     @apply text-center;
   }
 
-
   input::placeholder {
-    @apply text-darklink dark:text-darklink
+    @apply text-darklink dark:text-darklink;
   }
 
   .select-option select {
@@ -150,39 +145,38 @@
   }
 
   .checkbox {
-    @apply h-[18px] w-[18px] border border-bordergray dark:border-darkborder bg-transparent focus:ring-0 focus:ring-offset-0
+    @apply h-[18px] w-[18px] border border-bordergray dark:border-darkborder bg-transparent focus:ring-0 focus:ring-offset-0;
   }
 
   .text-primary-ld {
     @apply hover:text-primary dark:hover:text-primary;
   }
-  .custom-product-modal h3{
+  .custom-product-modal h3 {
     @apply text-lg font-semibold;
   }
 
-
   /* Button Hover Color Set */
   button.bg-primary {
-    @apply hover:bg-primaryemphasis
+    @apply hover:bg-primaryemphasis;
   }
 
   button.bg-secondary {
-    @apply hover:bg-secondaryemphasis
+    @apply hover:bg-secondaryemphasis;
   }
 
   button.bg-info {
-    @apply hover:bg-infoemphasis
+    @apply hover:bg-infoemphasis;
   }
 
   button.bg-error {
-    @apply hover:bg-erroremphasis
+    @apply hover:bg-erroremphasis;
   }
 
   button.bg-success {
-    @apply hover:bg-successemphasis
+    @apply hover:bg-successemphasis;
   }
 
   button.bg-warning {
-    @apply hover:bg-warningemphasis
+    @apply hover:bg-warningemphasis;
   }
 }
