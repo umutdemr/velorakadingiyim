@@ -18,11 +18,11 @@
   }
 
   body {
-    @apply text-sm overflow-x-hidden dark:bg-dark text-link dark:text-darklink;
+    @apply text-sm overflow-x-hidden text-link dark:text-darklink dark:bg-dark;
   }
 
   .dropdown {
-    @apply shadow-md bg-white dark:bg-dark relative rounded-sm dark:shadow-dark-md;
+    @apply relative rounded-sm shadow-md bg-white dark:bg-dark dark:shadow-dark-md;
   }
 
   .card-title {
@@ -33,7 +33,6 @@
     @apply text-sm font-medium dark:text-darklink;
   }
 
-  /* heading text color */
   h1,
   h2,
   h3,
@@ -52,59 +51,55 @@
   }
 
   .form-control input {
-    @apply w-full text-sm border border-border dark:border-darkborder bg-transparent dark:bg-transparent;
+    @apply w-full text-sm border border-border dark:border-darkborder bg-transparent;
   }
 
   .form-control.active-error input {
-    @apply w-full text-sm text-error border border-error bg-transparent dark:bg-transparent;
+    @apply w-full text-sm text-error border border-error bg-transparent;
   }
 
   .form-control.search input {
-    @apply w-full text-sm ps-10 border border-border dark:border-darkborder bg-transparent dark:bg-transparent;
+    @apply w-full text-sm ps-10 border border-border dark:border-darkborder bg-transparent;
   }
 
   .form-control-chat input {
-    @apply w-full text-sm rounded-md border-0 bg-transparent dark:bg-transparent;
+    @apply w-full text-sm rounded-md border-0 bg-transparent;
   }
 
   .form-control-chat input:focus {
-    @apply w-full text-sm border-0 ring-transparent outline-none bg-transparent dark:bg-transparent;
+    @apply outline-none ring-0 border-0 bg-transparent;
   }
 
   .form-control-rounded input {
-    @apply w-full text-sm rounded-full border border-border dark:border-darkborder bg-transparent dark:bg-transparent;
+    @apply w-full text-sm rounded-full border border-border dark:border-darkborder bg-transparent;
   }
 
   .form-control-rounded input:focus {
-    @apply border-primary outline-none ring-transparent;
+    @apply border-primary outline-none ring-0;
   }
 
   .form-control-textarea {
-    @apply w-full text-sm p-4 rounded-full border border-border dark:border-darkborder bg-transparent dark:bg-transparent;
+    @apply w-full text-sm p-4 rounded-full border border-border dark:border-darkborder bg-transparent;
   }
 
   .form-control-textarea:focus {
-    @apply border-primary outline-none ring-transparent;
-  }
-
-  .form-control input:focus {
-    @apply border-primary outline-none ring-transparent;
+    @apply border-primary outline-none ring-0;
   }
 
   .form-control-input {
-    @apply w-full text-sm rounded-md border border-border dark:border-darkborder bg-transparent dark:bg-transparent;
+    @apply w-full text-sm rounded-md border border-border dark:border-darkborder bg-transparent;
   }
 
   .form-control-input:focus {
-    @apply border-primary outline-none ring-transparent;
+    @apply border-primary outline-none ring-0;
   }
 
   .form-rounded-md input {
-    @apply w-full text-sm rounded-md border border-border dark:border-darkborder bg-transparent dark:bg-transparent;
+    @apply w-full text-sm rounded-md border border-border dark:border-darkborder bg-transparent;
   }
 
   .form-rounded-md input:focus {
-    @apply border-primary outline-none ring-transparent;
+    @apply border-primary outline-none ring-0;
   }
 
   .form-rounded input {
@@ -155,7 +150,6 @@
     @apply text-lg font-semibold;
   }
 
-  /* Button Hover Color Set */
   button.bg-primary {
     @apply hover:bg-primaryemphasis;
   }
