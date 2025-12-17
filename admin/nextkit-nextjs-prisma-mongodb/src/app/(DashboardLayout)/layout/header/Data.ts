@@ -15,9 +15,9 @@ interface ProfileType {
   icon: string;
 }
 
-import acccountIcon from "/images/svgs/icon-account.svg";
-import inboxIcon from "/images/svgs/icon-inbox.svg";
-import taskIcon from "/images/svgs/icon-tasks.svg";
+const inboxIcon = "/images/svgs/icon-inbox.svg";
+const acccountIcon = "/images/svgs/icon-account.svg";
+const taskIcon = "/images/svgs/icon-tasks.svg";
 import { ForwardRefExoticComponent, RefAttributes } from "react";
 
 const profileDD: ProfileType[] = [
