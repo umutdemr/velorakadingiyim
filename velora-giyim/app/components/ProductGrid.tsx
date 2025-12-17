@@ -47,9 +47,10 @@ export default function SmoothProductSlider() {
 
     (async () => {
       try {
-        const res = await apiFetch<{ data: Product[] }>(`/product?limit=30`, {
-          signal: controller.signal,
-        });
+        const res = await apiFetch<{ data: Product[] }>(
+          `/api/product?limit=30`,
+          { signal: controller.signal }
+        );
 
         if (!alive) return;
 

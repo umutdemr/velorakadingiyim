@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Menu, X, User, ShoppingBag, Heart } from "lucide-react"; // ✅ Search kaldırıldı, Heart eklendi
+import { Menu, X, User, ShoppingBag, Heart } from "lucide-react";
 import { apiFetch } from "@/app/lib/api";
 import { useCart } from "@/app/context/CartContext";
 
@@ -64,7 +64,7 @@ export default function Navbar() {
   }, [open]);
 
   useEffect(() => {
-    apiFetch<{ data: Category[] }>("/category")
+    apiFetch<{ data: Category[] }>("/api/category")
       .then((res) => setCategories(buildCategoryTree(res.data)))
       .catch(console.error);
   }, []);
@@ -86,7 +86,6 @@ export default function Navbar() {
           </Link>
 
           <div className="flex gap-4 items-center">
-            {/* ✅ Favoriler */}
             <Link
               href="/favorites"
               className="p-2 rounded-md hover:bg-gray-100"
@@ -95,7 +94,6 @@ export default function Navbar() {
               <Heart className="w-5 h-5" />
             </Link>
 
-            {/* ✅ Login */}
             <Link
               href="/login"
               className="p-2 rounded-md hover:bg-gray-100"
@@ -137,7 +135,6 @@ export default function Navbar() {
               <X className="w-6 h-6" />
             </button>
 
-            {/* Mobil hızlı linkler */}
             <div className="mb-6 grid grid-cols-2 gap-3">
               <Link
                 href="/favorites"
