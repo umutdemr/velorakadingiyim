@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
 const prisma = new PrismaClient();
 
@@ -26,7 +26,7 @@ export async function OPTIONS() {
    GET – Product Detail
 ========================= */
 export async function GET(
-  req: NextRequest,
+  _req: Request,
   { params }: { params: { slug: string } }
 ) {
   try {
