@@ -1,0 +1,7 @@
+[build]
+  base = "velora-giyim"
+  command = "npm run build"
+  publish = ".next"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
