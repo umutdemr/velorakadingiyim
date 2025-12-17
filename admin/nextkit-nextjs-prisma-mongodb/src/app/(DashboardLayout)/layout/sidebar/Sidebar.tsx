@@ -8,7 +8,6 @@ import SimpleBar from "simplebar-react";
 import { Icon } from "@iconify/react";
 import Image from "next/image";
 import FullLogo from "../shared/logo/FullLogo";
-import rocket from "/public/images/backgrounds/rocket.png";
 import Link from "next/link";
 const SidebarLayout = () => {
   return (
