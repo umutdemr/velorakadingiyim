@@ -1,12 +1,12 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 @import url("./layouts/container.css");
 @import url("./layouts/sidebar.css");
 @import url("./layouts/header.css");
 @import url("./theme/default-colors.css");
 @import url("./override/reboot.css");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 @layer components {
   .container {
