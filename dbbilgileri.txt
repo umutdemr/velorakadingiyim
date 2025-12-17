@@ -1,0 +1,3 @@
+velorakadingiyimm_db_user
+fg2mpwxABzGbsVB0
+mongodb+srv://velorakadingiyimm_db_user:fg2mpwxABzGbsVB0@veloragiyim.gddblid.mongodb.net/
