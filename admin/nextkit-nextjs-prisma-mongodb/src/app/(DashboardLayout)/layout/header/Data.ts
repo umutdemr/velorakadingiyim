@@ -1,5 +1,10 @@
-
-import { IconUser, IconMail, IconListCheck, IconProps, Icon} from '@tabler/icons-react';
+import {
+  IconUser,
+  IconMail,
+  IconListCheck,
+  IconProps,
+  Icon,
+} from "@tabler/icons-react";
 
 //  Profile Data
 interface ProfileType {
@@ -7,27 +12,27 @@ interface ProfileType {
   img: any;
   subtitle: string;
   url: string;
-  icon:string
+  icon: string;
 }
 
-import acccountIcon from "/public/images/svgs/icon-account.svg";
-import inboxIcon from "/public/images/svgs/icon-inbox.svg";
-import taskIcon from "/public/images/svgs/icon-tasks.svg";
-import { ForwardRefExoticComponent, RefAttributes } from 'react';
+import acccountIcon from "/images/svgs/icon-account.svg";
+import inboxIcon from "/images/svgs/icon-inbox.svg";
+import taskIcon from "/images/svgs/icon-tasks.svg";
+import { ForwardRefExoticComponent, RefAttributes } from "react";
 
 const profileDD: ProfileType[] = [
   {
     img: acccountIcon,
     title: "My Profile",
     subtitle: "Account settings",
-    icon:"tabler:user",
+    icon: "tabler:user",
     url: "/user-profile",
   },
   {
     img: inboxIcon,
     title: "All Orders",
     subtitle: "My Daily Notes",
-    icon:"tabler:align-box-bottom-right",
+    icon: "tabler:align-box-bottom-right",
     url: "/utilities/table",
   },
 ];
@@ -55,7 +60,4 @@ const Notifications = [
   },
 ];
 
-export {
-  Notifications,
-  profileDD,
-};
+export { Notifications, profileDD };
