@@ -1,10 +1,6 @@
 "use client";
 import { Badge, Dropdown, Select, Table } from "flowbite-react";
-import userimg1 from "/images/profile/user-3.jpg";
-import userimg2 from "/images/profile/user-5.jpg";
-import userimg3 from "/images/profile/user-6.jpg";
-import userimg4 from "/images/profile/user-7.jpg";
-import userimg5 from "/images/profile/user-8.jpg";
+
 import { TbDotsVertical } from "react-icons/tb";
 import Image from "next/image";
 import CardBox from "@/app/components/shared/CardBox";
@@ -14,7 +10,6 @@ const page = () => {
   const PerformersData = [
     {
       key: "performerData1",
-      profileImg: userimg1,
       username: "Sunil Joshi",
       designation: "Web Designer",
       project: "Elite Admin",
@@ -25,7 +20,6 @@ const page = () => {
     },
     {
       key: "performerData2",
-      profileImg: userimg2,
       username: "John Deo",
       designation: "Web Developer",
       project: "Flexy Admin",
@@ -36,7 +30,6 @@ const page = () => {
     },
     {
       key: "performerData3",
-      profileImg: userimg3,
       username: "Nirav Joshi",
       designation: "Web Manager",
       project: "Material Pro",
@@ -46,7 +39,6 @@ const page = () => {
     },
     {
       key: "performerData4",
-      profileImg: userimg4,
       username: "Yuvraj Sheth",
       designation: "Project Manager",
       project: "Xtreme Admin",
@@ -57,7 +49,6 @@ const page = () => {
     },
     {
       key: "performerData5",
-      profileImg: userimg5,
       username: "Micheal Doe",
       designation: "Content Writer",
       project: "Helping Hands WP Theme",
