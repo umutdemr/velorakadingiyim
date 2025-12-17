@@ -27,7 +27,9 @@ export const authOptions = {
         return {
           id: user.id,
           email: user.email,
-          name: user.name ?? user.email,
+          name:
+            `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim() ||
+            user.email,
         };
       },
     }),
