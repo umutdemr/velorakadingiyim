@@ -6,6 +6,9 @@ import bcrypt from "bcryptjs";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+/* =========================
+   PRISMA SINGLETON
+========================= */
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
 const prisma =
@@ -16,31 +19,44 @@ const prisma =
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
-// ✅ DEV için izinli origin listesi
+/* =========================
+   CORS CONFIG (FIXED)
+========================= */
 const ALLOWED_ORIGINS = new Set([
-  "http://localhost:3001", // FE
-  "http://localhost:3000", // BE aynı origin testleri
+  "http://localhost:3000",
+  "http://localhost:3001",
+  "https://velorakadingiyim.vercel.app",
 ]);
 
 function corsHeaders(req: NextRequest) {
   const origin = req.headers.get("origin") || "";
-  const allowOrigin = ALLOWED_ORIGINS.has(origin) ? origin : "null";
+  const allowOrigin = ALLOWED_ORIGINS.has(origin) ? origin : "";
 
-  return {
-    "Access-Control-Allow-Origin": allowOrigin,
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
+  const headers: Record<string, string> = {
+    "Access-Control-Allow-Methods": "POST,OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type, Authorization",
-    // Eğer cookie/credentials kullanacaksan:
-    // "Access-Control-Allow-Credentials": "true",
+    "Access-Control-Max-Age": "86400",
     Vary: "Origin",
   };
+
+  if (allowOrigin) {
+    headers["Access-Control-Allow-Origin"] = allowOrigin;
+    headers["Access-Control-Allow-Credentials"] = "true";
+  }
+
+  return headers;
 }
 
-// ✅ Preflight
+/* =========================
+   OPTIONS – Preflight
+========================= */
 export async function OPTIONS(req: NextRequest) {
   return new NextResponse(null, { status: 204, headers: corsHeaders(req) });
 }
 
+/* =========================
+   POST – Register Customer
+========================= */
 export async function POST(req: NextRequest) {
   const headers = corsHeaders(req);
 

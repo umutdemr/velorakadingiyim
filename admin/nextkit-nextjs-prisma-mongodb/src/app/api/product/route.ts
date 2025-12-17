@@ -1,6 +1,9 @@
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
 /* =========================
    PRISMA SINGLETON (dev'de connection leak önler)
 ========================= */
@@ -15,39 +18,45 @@ const prisma =
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
 /* =========================
-   CORS CONFIG
-   - localhost:3000 ve localhost:3001'e izin ver
+   CORS CONFIG (FIXED)
 ========================= */
-const allowedOrigins =
-  process.env.NODE_ENV === "production"
-    ? ["https://velora-giyim.vercel.app"]
-    : ["http://localhost:3000", "http://localhost:3001"];
+const ALLOWED_ORIGINS = new Set([
+  "http://localhost:3000",
+  "http://localhost:3001",
+  "https://velorakadingiyim.vercel.app",
+]);
 
-function getCorsHeaders(req?: NextRequest) {
-  const origin = req?.headers.get("origin") ?? "";
-  const allowOrigin = allowedOrigins.includes(origin)
-    ? origin
-    : allowedOrigins[0];
+function corsHeaders(req: NextRequest) {
+  const origin = req.headers.get("origin") || "";
+  const allowOrigin = ALLOWED_ORIGINS.has(origin) ? origin : "";
 
-  return {
-    "Access-Control-Allow-Origin": allowOrigin,
+  const headers: Record<string, string> = {
     "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    "Access-Control-Max-Age": "86400",
+    Vary: "Origin",
   };
+
+  if (allowOrigin) {
+    headers["Access-Control-Allow-Origin"] = allowOrigin;
+    headers["Access-Control-Allow-Credentials"] = "true";
+  }
+
+  return headers;
 }
 
 /* =========================
    OPTIONS – Preflight
 ========================= */
 export async function OPTIONS(req: NextRequest) {
-  return NextResponse.json({}, { headers: getCorsHeaders(req) });
+  return new NextResponse(null, { status: 204, headers: corsHeaders(req) });
 }
 
 /* =========================
    GET – Products
 ========================= */
 export async function GET(req: NextRequest) {
-  const corsHeaders = getCorsHeaders(req);
+  const headers = corsHeaders(req);
 
   try {
     const { searchParams } = new URL(req.url);
@@ -60,7 +69,7 @@ export async function GET(req: NextRequest) {
 
       return NextResponse.json(
         { data: products, message: "Products fetched successfully" },
-        { status: 200, headers: corsHeaders }
+        { status: 200, headers }
       );
     }
 
@@ -72,7 +81,7 @@ export async function GET(req: NextRequest) {
     if (!category) {
       return NextResponse.json(
         { data: [], message: "No products found" },
-        { status: 200, headers: corsHeaders }
+        { status: 200, headers }
       );
     }
 
@@ -88,13 +97,13 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(
       { data: products, message: "Products fetched successfully" },
-      { status: 200, headers: corsHeaders }
+      { status: 200, headers }
     );
   } catch (error) {
     console.error("Error fetching products:", error);
     return NextResponse.json(
       { error: "Failed to fetch products" },
-      { status: 500, headers: corsHeaders }
+      { status: 500, headers }
     );
   }
 }
@@ -103,7 +112,7 @@ export async function GET(req: NextRequest) {
    POST – Yeni ürün oluştur
 ========================= */
 export async function POST(req: NextRequest) {
-  const corsHeaders = getCorsHeaders(req);
+  const headers = corsHeaders(req);
 
   try {
     const body = await req.json();
@@ -125,7 +134,7 @@ export async function POST(req: NextRequest) {
     if (!name || !productCode || !price || !images || !slug) {
       return NextResponse.json(
         { error: "Please provide all required fields" },
-        { status: 400, headers: corsHeaders }
+        { status: 400, headers }
       );
     }
 
@@ -148,13 +157,13 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       { data: newProduct, message: "Product created successfully" },
-      { status: 201, headers: corsHeaders }
+      { status: 201, headers }
     );
   } catch (error) {
     console.error("Error creating product:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
-      { status: 500, headers: corsHeaders }
+      { status: 500, headers }
     );
   }
 }
@@ -163,7 +172,7 @@ export async function POST(req: NextRequest) {
    PUT – Ürün güncelle
 ========================= */
 export async function PUT(req: NextRequest) {
-  const corsHeaders = getCorsHeaders(req);
+  const headers = corsHeaders(req);
 
   try {
     const body = await req.json();
@@ -186,7 +195,7 @@ export async function PUT(req: NextRequest) {
     if (!id || !name || !productCode || !price || !images || !slug) {
       return NextResponse.json(
         { error: "Please provide all required fields" },
-        { status: 400, headers: corsHeaders }
+        { status: 400, headers }
       );
     }
 
@@ -210,22 +219,21 @@ export async function PUT(req: NextRequest) {
 
     return NextResponse.json(
       { data: updatedProduct, message: "Product updated successfully" },
-      { status: 200, headers: corsHeaders }
+      { status: 200, headers }
     );
   } catch (error: any) {
     console.error("Error updating product:", error);
 
-    // Prisma kayıt bulunamadı
     if (error?.code === "P2025") {
       return NextResponse.json(
         { error: "Product not found" },
-        { status: 404, headers: corsHeaders }
+        { status: 404, headers }
       );
     }
 
     return NextResponse.json(
       { error: "Internal Server Error" },
-      { status: 500, headers: corsHeaders }
+      { status: 500, headers }
     );
   }
 }
@@ -236,13 +244,11 @@ export async function PUT(req: NextRequest) {
    ✅ veya body: { id: "..." }
 ========================= */
 export async function DELETE(req: NextRequest) {
-  const corsHeaders = getCorsHeaders(req);
+  const headers = corsHeaders(req);
 
   try {
-    // 1) Önce query param
     const idFromQuery = req.nextUrl.searchParams.get("id");
 
-    // 2) Query yoksa body dene (body boşsa patlamasın)
     let idFromBody: string | null = null;
     if (!idFromQuery) {
       const contentType = req.headers.get("content-type") || "";
@@ -251,7 +257,7 @@ export async function DELETE(req: NextRequest) {
           const body = await req.json();
           idFromBody = body?.id ?? null;
         } catch {
-          // body boş/invalid olabilir -> ignore
+          // ignore
         }
       }
     }
@@ -261,7 +267,7 @@ export async function DELETE(req: NextRequest) {
     if (!id) {
       return NextResponse.json(
         { error: "Product ID required (use ?id=... or JSON body {id})" },
-        { status: 400, headers: corsHeaders }
+        { status: 400, headers }
       );
     }
 
@@ -269,22 +275,21 @@ export async function DELETE(req: NextRequest) {
 
     return NextResponse.json(
       { message: "Product deleted successfully" },
-      { status: 200, headers: corsHeaders }
+      { status: 200, headers }
     );
   } catch (error: any) {
     console.error("Error deleting product:", error);
 
-    // Prisma kayıt bulunamadı
     if (error?.code === "P2025") {
       return NextResponse.json(
         { error: "Product not found" },
-        { status: 404, headers: corsHeaders }
+        { status: 404, headers }
       );
     }
 
     return NextResponse.json(
       { error: "Internal Server Error" },
-      { status: 500, headers: corsHeaders }
+      { status: 500, headers }
     );
   }
 }

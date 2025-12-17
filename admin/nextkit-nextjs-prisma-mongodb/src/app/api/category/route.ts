@@ -1,54 +1,89 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 
-const prisma = new PrismaClient();
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
-/* =========================
-   CORS CONFIG
-========================= */
-const corsHeaders = {
-  "Access-Control-Allow-Origin":
-    process.env.NODE_ENV === "production"
-      ? "https://velora-giyim.vercel.app"
-      : "http://localhost:3001",
-  "Access-Control-Allow-Methods": "GET,POST,DELETE,OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+const globalForPrisma = globalThis as unknown as {
+  prisma?: PrismaClient;
 };
 
-/* =========================
-   OPTIONS – Preflight (CORS)
-========================= */
-export async function OPTIONS() {
-  return NextResponse.json({}, { headers: corsHeaders });
+const prisma =
+  globalForPrisma.prisma ??
+  new PrismaClient({
+    log: ["error", "warn"],
+  });
+
+if (process.env.NODE_ENV !== "production") {
+  globalForPrisma.prisma = prisma;
 }
 
 /* =========================
-   GET – Categories (parent + children)
+   CORS CONFIG (FIXED)
 ========================= */
-export async function GET() {
+const ALLOWED_ORIGINS = new Set([
+  "http://localhost:3000",
+  "http://localhost:3001",
+  "https://velorakadingiyim.vercel.app",
+]);
+
+function corsHeaders(req: NextRequest) {
+  const origin = req.headers.get("origin") || "";
+  const allowOrigin = ALLOWED_ORIGINS.has(origin) ? origin : "";
+
+  const headers: Record<string, string> = {
+    "Access-Control-Allow-Methods": "GET,POST,DELETE,OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    "Access-Control-Max-Age": "86400",
+    Vary: "Origin",
+  };
+
+  if (allowOrigin) {
+    headers["Access-Control-Allow-Origin"] = allowOrigin;
+    headers["Access-Control-Allow-Credentials"] = "true";
+  }
+
+  return headers;
+}
+
+/* =========================
+   OPTIONS – Preflight
+========================= */
+export async function OPTIONS(req: NextRequest) {
+  return new NextResponse(null, {
+    status: 204,
+    headers: corsHeaders(req),
+  });
+}
+
+/* =========================
+   GET – Categories
+========================= */
+export async function GET(req: NextRequest) {
   try {
     const categories = await prisma.category.findMany({
       include: {
         parent: true,
         children: true,
       },
-      orderBy: {
-        name: "asc",
-      },
+      orderBy: { name: "asc" },
     });
 
-    return NextResponse.json({ data: categories }, { headers: corsHeaders });
+    return NextResponse.json(
+      { data: categories },
+      { status: 200, headers: corsHeaders(req) }
+    );
   } catch (error) {
     console.error("GET /category error:", error);
     return NextResponse.json(
       { error: "Failed to fetch categories" },
-      { status: 500, headers: corsHeaders }
+      { status: 500, headers: corsHeaders(req) }
     );
   }
 }
 
 /* =========================
-   POST – Add Category (Main / Sub)
+   POST – Add Category
 ========================= */
 export async function POST(req: NextRequest) {
   try {
@@ -57,7 +92,7 @@ export async function POST(req: NextRequest) {
     if (!name || !slug) {
       return NextResponse.json(
         { error: "Name and slug are required" },
-        { status: 400, headers: corsHeaders }
+        { status: 400, headers: corsHeaders(req) }
       );
     }
 
@@ -65,19 +100,19 @@ export async function POST(req: NextRequest) {
       data: {
         name,
         slug,
-        parentId: parentId || null, // ✅ main category için kritik
+        parentId: parentId || null,
       },
     });
 
     return NextResponse.json(
       { data: category },
-      { status: 201, headers: corsHeaders }
+      { status: 201, headers: corsHeaders(req) }
     );
   } catch (error) {
     console.error("POST /category error:", error);
     return NextResponse.json(
       { error: "Failed to create category" },
-      { status: 500, headers: corsHeaders }
+      { status: 500, headers: corsHeaders(req) }
     );
   }
 }
@@ -93,7 +128,7 @@ export async function DELETE(req: NextRequest) {
     if (!id) {
       return NextResponse.json(
         { error: "Category ID is required" },
-        { status: 400, headers: corsHeaders }
+        { status: 400, headers: corsHeaders(req) }
       );
     }
 
@@ -101,12 +136,15 @@ export async function DELETE(req: NextRequest) {
       where: { id },
     });
 
-    return NextResponse.json({ success: true }, { headers: corsHeaders });
+    return NextResponse.json(
+      { success: true },
+      { status: 200, headers: corsHeaders(req) }
+    );
   } catch (error) {
     console.error("DELETE /category error:", error);
     return NextResponse.json(
       { error: "Failed to delete category" },
-      { status: 500, headers: corsHeaders }
+      { status: 500, headers: corsHeaders(req) }
     );
   }
 }

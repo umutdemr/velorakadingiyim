@@ -20,19 +20,27 @@ if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 const ALLOWED_ORIGINS = new Set([
   "http://localhost:3000",
   "http://localhost:3001",
+  "https://velorakadingiyim.vercel.app",
 ]);
 
 function corsHeaders(req: NextRequest) {
   const origin = req.headers.get("origin") || "";
-  const allowOrigin = ALLOWED_ORIGINS.has(origin) ? origin : "*";
+  const allowOrigin = ALLOWED_ORIGINS.has(origin) ? origin : "";
 
-  return {
-    "Access-Control-Allow-Origin": allowOrigin,
-    "Access-Control-Allow-Methods": "GET,OPTIONS",
+  const h: Record<string, string> = {
+    "Access-Control-Allow-Methods": "GET,POST,PUT,PATCH,DELETE,OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type, Authorization",
     "Access-Control-Max-Age": "86400",
     Vary: "Origin",
   };
+
+  // Sadece whitelist’teyse origin döndür (yoksa hiç ekleme)
+  if (allowOrigin) {
+    h["Access-Control-Allow-Origin"] = allowOrigin;
+    h["Access-Control-Allow-Credentials"] = "true";
+  }
+
+  return h;
 }
 
 function json(req: NextRequest, body: any, init?: ResponseInit) {

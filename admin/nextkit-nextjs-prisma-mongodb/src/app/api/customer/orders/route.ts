@@ -6,6 +6,9 @@ import jwt from "jsonwebtoken";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+/* =========================
+   PRISMA SINGLETON
+========================= */
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
 const prisma =
@@ -16,25 +19,32 @@ const prisma =
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
-// ---------- CORS (geliştirme: allowlist + Vary: Origin) ----------
+/* =========================
+   CORS CONFIG (FIXED)
+========================= */
 const ALLOWED_ORIGINS = new Set([
   "http://localhost:3000",
   "http://localhost:3001",
+  "https://velorakadingiyim.vercel.app",
 ]);
 
 function corsHeaders(req: NextRequest) {
   const origin = req.headers.get("origin") || "";
-  // preflight ve gerçek istekte origin allowlist'te değilse "*" dönmek yerine boş bırakmak daha güvenli olur
-  // ama dev için mevcut yaklaşımı koruyoruz:
-  const allowOrigin = ALLOWED_ORIGINS.has(origin) ? origin : "*";
+  const allowOrigin = ALLOWED_ORIGINS.has(origin) ? origin : "";
 
-  return {
-    "Access-Control-Allow-Origin": allowOrigin,
+  const headers: Record<string, string> = {
     "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type, Authorization",
     "Access-Control-Max-Age": "86400",
     Vary: "Origin",
   };
+
+  if (allowOrigin) {
+    headers["Access-Control-Allow-Origin"] = allowOrigin;
+    headers["Access-Control-Allow-Credentials"] = "true";
+  }
+
+  return headers;
 }
 
 function json(req: NextRequest, body: any, init?: ResponseInit) {
@@ -44,23 +54,35 @@ function json(req: NextRequest, body: any, init?: ResponseInit) {
   });
 }
 
+/* =========================
+   OPTIONS – Preflight
+========================= */
 export async function OPTIONS(req: NextRequest) {
   return new NextResponse(null, { status: 204, headers: corsHeaders(req) });
 }
 
-// ---------- AUTH ----------
+/* =========================
+   AUTH
+========================= */
+function normalizeSecret(v?: string | null) {
+  if (!v) return "";
+  const s = String(v).trim();
+  return s
+    .replace(/^"(.*)"$/, "$1")
+    .replace(/^'(.*)'$/, "$1")
+    .trim();
+}
+
 function getUserIdFromReq(req: NextRequest): string | null {
   const auth = req.headers.get("authorization") || "";
   const token = auth.startsWith("Bearer ") ? auth.slice(7).trim() : "";
   if (!token) return null;
 
   try {
-    const secret = process.env.JWT_SECRET;
+    const secret = normalizeSecret(process.env.JWT_SECRET);
     if (!secret) return null;
 
     const payload = jwt.verify(token, secret) as any;
-
-    // login endpointin hangi alanı koyuyorsa onu yakalayalım
     return payload?.userId || payload?.sub || payload?.id || null;
   } catch {
     return null;
@@ -71,8 +93,7 @@ type CreateOrderBody = {
   currency?: string; // default TRY
   status?: string; // pending|paid|...
   items: Array<{
-    // FE’den gelebilecek alternatifler:
-    id?: string; // productId yerine
+    id?: string;
     productId?: string | null;
 
     name?: string;
@@ -84,14 +105,16 @@ type CreateOrderBody = {
     image?: string | null;
     size?: string | null;
 
-    price?: number; // unitPrice yerine
+    price?: number;
     unitPrice?: number;
 
     quantity?: number;
   }>;
 };
 
-// ---------- GET /api/customer/orders ----------
+/* =========================
+   GET /api/customer/orders
+========================= */
 export async function GET(req: NextRequest) {
   try {
     const userId = getUserIdFromReq(req);
@@ -116,7 +139,9 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// ---------- POST /api/customer/orders ----------
+/* =========================
+   POST /api/customer/orders
+========================= */
 export async function POST(req: NextRequest) {
   try {
     const userId = getUserIdFromReq(req);
@@ -139,12 +164,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // toplam hesapla + validasyon
     let total = 0;
 
     const mappedItems = items.map((it) => {
       const productIdRaw = String(it?.productId ?? it?.id ?? "").trim();
-
       const productName = String(it?.productName ?? it?.name ?? "").trim();
 
       const productSlugRaw = String(it?.productSlug ?? it?.slug ?? "").trim();
@@ -172,7 +195,6 @@ export async function POST(req: NextRequest) {
       total += unitPrice * quantity;
 
       return {
-        // OrderItem şeması: productId opsiyonel
         productId: productIdRaw ? productIdRaw : null,
         productName,
         productSlug,
@@ -183,7 +205,6 @@ export async function POST(req: NextRequest) {
       };
     });
 
-    // Order şeması: total zorunlu, currency default TRY, status default pending
     const currency = String(body?.currency ?? "TRY").trim() || "TRY";
     const status = String(body?.status ?? "pending").trim() || "pending";
 
@@ -206,7 +227,6 @@ export async function POST(req: NextRequest) {
   } catch (err: any) {
     console.error("ORDERS POST ERROR:", err);
 
-    // ✅ Hata çözümü: Prisma JWT/ObjectId hataları dahil, mesajı güvenli şekilde döndür
     const msg =
       typeof err?.message === "string" && err.message
         ? err.message
