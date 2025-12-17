@@ -1,5 +1,4 @@
 import type { Config } from "tailwindcss";
-import flowbite from "flowbite-react/tailwind";
 const config: Config = {
   darkMode: "class",
   content: [
@@ -8,7 +7,6 @@ const config: Config = {
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
 
     // Flowbite content
-    flowbite.content(),
   ],
   theme: {
     extend: {
@@ -27,7 +25,7 @@ const config: Config = {
         tw: "12px",
       },
       lineHeight: {
-        '21': '21px',
+        "21": "21px",
       },
       container: {
         center: true,
@@ -77,8 +75,8 @@ const config: Config = {
         erroremphasis: "var(--color-error-emphasis)",
         successemphasis: "var(--color-success-emphasis)",
         infoemphasis: "var(--color-info-emphasis)",
-        purple: 'rgba(var(--color-purple))',
-        algaegreen: 'rgba(var(--color-algaegreen))',
+        purple: "rgba(var(--color-purple))",
+        algaegreen: "rgba(var(--color-algaegreen))",
       },
     },
   },
