@@ -1,16 +1,23 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "");
-
-if (!API_URL) {
-  throw new Error("NEXT_PUBLIC_API_URL is not defined");
-}
-
 function hasInvalidQuery(endpoint: string) {
   return endpoint.includes("=undefined") || endpoint.includes("=null");
 }
 
+function normalizeEndpoint(endpoint: string) {
+  if (!endpoint.startsWith("/")) {
+    endpoint = `/${endpoint}`;
+  }
+
+  // Sadece frontend api route'larına izin ver
+  if (!endpoint.startsWith("/api/")) {
+    endpoint = `/api${endpoint}`;
+  }
+
+  return endpoint;
+}
+
 export async function apiFetch<T>(
   endpoint: string,
-  options?: RequestInit
+  options: RequestInit = {}
 ): Promise<T> {
   if (!endpoint) {
     throw new Error("apiFetch called without endpoint");
@@ -21,25 +28,36 @@ export async function apiFetch<T>(
     throw new Error("Invalid API query (undefined parameter)");
   }
 
-  const url = `${API_URL}${endpoint}`;
+  const url = normalizeEndpoint(endpoint);
 
   const res = await fetch(url, {
     ...options,
     headers: {
-      "Content-Type": "application/json",
-      ...(options?.headers || {}),
+      ...(options.headers || {}),
+      "Content-Type":
+        (options.headers as Record<string, string> | undefined)?.[
+          "Content-Type"
+        ] || "application/json",
     },
     cache: "no-store",
   });
 
   if (!res.ok) {
-    let message = "API Error";
+    const contentType = res.headers.get("content-type") || "";
+    let message = `API Error (${res.status})`;
+
     try {
-      const data = await res.json();
-      message = data?.error || message;
+      if (contentType.includes("application/json")) {
+        const data = await res.json();
+        message = data?.error || data?.message || message;
+      } else {
+        const text = await res.text();
+        if (text) message = text;
+      }
     } catch {}
+
     throw new Error(message);
   }
 
-  return res.json();
+  return (await res.json()) as T;
 }
