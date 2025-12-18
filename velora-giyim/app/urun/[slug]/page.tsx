@@ -106,7 +106,7 @@ export default function ProductDetailPage() {
     (async () => {
       try {
         const res = await apiFetch<{ data: Product }>(
-          `/product/${encodeURIComponent(slug)}`,
+          `/api/product/${encodeURIComponent(slug)}`,
           { signal: controller.signal }
         );
 

@@ -13,6 +13,8 @@ type Product = {
   images: string[];
 };
 
+const PLACEHOLDER_IMAGE = "/placeholder.jpg";
+
 export default function AltGiyimPage() {
   const params = useParams();
 
@@ -27,14 +29,18 @@ export default function AltGiyimPage() {
     return null;
   }, [params]);
 
+  const formatter = useMemo(
+    () =>
+      new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }),
+    []
+  );
+
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Hydration bitmeden hiçbir şey gösterme/fetchleme
     if (!hydrated) return;
 
-    // slug henüz gelmediyse: loading açık kalsın (flash fix)
     if (!slug) {
       setLoading(true);
       return;
@@ -48,13 +54,22 @@ export default function AltGiyimPage() {
     (async () => {
       try {
         const res = await apiFetch<{ data: Product[] }>(
-          `/product?slug=${encodeURIComponent(slug)}`,
+          `/api/product?slug=${encodeURIComponent(slug)}`,
           { signal: controller.signal }
         );
 
         if (!alive) return;
 
-        setProducts(Array.isArray(res.data) ? res.data : []);
+        const safe = Array.isArray(res.data) ? res.data : [];
+        setProducts(
+          safe.map((p) => ({
+            ...p,
+            images:
+              Array.isArray(p.images) && p.images.filter(Boolean).length > 0
+                ? p.images.filter(Boolean)
+                : [PLACEHOLDER_IMAGE],
+          }))
+        );
       } catch (err: any) {
         if (err?.name === "AbortError") return;
         console.error("Product fetch error:", err);
@@ -92,7 +107,6 @@ export default function AltGiyimPage() {
       "Şık, modern ve tek parça rahatlığı sunan tulum modellerimizle tanış.",
   };
 
-  // Hydration/slug hazır değilken: direkt loading
   if (!hydrated || !slug) {
     return (
       <main className="pt-28 px-8 min-h-screen bg-[#fefcfb] text-gray-900">
@@ -125,10 +139,10 @@ export default function AltGiyimPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {products.map((product) => (
               <Link key={product.id} href={`/urun/${product.slug}`}>
-                <div className="bg-white rounded-2xl shadow-sm hover:shadow-md transition cursor-pointer">
+                <div className="bg-white rounded-2xl shadow-sm hover:shadow-md transition cursor-pointer overflow-hidden">
                   <div className="overflow-hidden">
                     <img
-                      src={product.images?.[0] || "/placeholder.jpg"}
+                      src={product.images?.[0] || PLACEHOLDER_IMAGE}
                       alt={product.name}
                       className="w-full h-80 object-cover hover:scale-105 transition"
                       loading="lazy"
@@ -139,7 +153,7 @@ export default function AltGiyimPage() {
                       {product.name}
                     </h3>
                     <p className="text-[#B39B4C] font-medium">
-                      ₺{product.price}
+                      {formatter.format(product.price)}
                     </p>
                   </div>
                 </div>

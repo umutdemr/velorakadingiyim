@@ -50,7 +50,7 @@ export default function KadinTakimCategoryPage() {
     (async () => {
       try {
         const res = await apiFetch<{ data: Product[] }>(
-          `/product?slug=${encodeURIComponent(slug)}`,
+          `/api/product?slug=${encodeURIComponent(slug)}`,
           { signal: controller.signal }
         );
 

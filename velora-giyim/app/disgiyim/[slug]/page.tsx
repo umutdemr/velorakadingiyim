@@ -13,6 +13,8 @@ type Product = {
   images: string[];
 };
 
+const PLACEHOLDER_IMAGE = "/placeholder.jpg";
+
 export default function DisGiyimPage() {
   const params = useParams();
 
@@ -27,11 +29,17 @@ export default function DisGiyimPage() {
     return null;
   }, [params]);
 
+  const formatter = useMemo(
+    () =>
+      new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }),
+    []
+  );
+
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
   // -----------------------------------
-  // BACKEND'TEN ÜRÜN ÇEKME
+  // FRONTEND PROXY'DEN ÜRÜN ÇEKME (/api/product?slug=...)
   // -----------------------------------
   useEffect(() => {
     if (!hydrated) return;
@@ -50,13 +58,22 @@ export default function DisGiyimPage() {
     (async () => {
       try {
         const res = await apiFetch<{ data: Product[] }>(
-          `/product?slug=${encodeURIComponent(slug)}`,
+          `/api/product?slug=${encodeURIComponent(slug)}`,
           { signal: controller.signal }
         );
 
         if (!alive) return;
 
-        setProducts(Array.isArray(res.data) ? res.data : []);
+        const safe = Array.isArray(res.data) ? res.data : [];
+        setProducts(
+          safe.map((p) => ({
+            ...p,
+            images:
+              Array.isArray(p.images) && p.images.filter(Boolean).length > 0
+                ? p.images.filter(Boolean)
+                : [PLACEHOLDER_IMAGE],
+          }))
+        );
       } catch (err: any) {
         if (err?.name === "AbortError") return;
         console.error("Product fetch error:", err);
@@ -129,7 +146,7 @@ export default function DisGiyimPage() {
                 <div className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden cursor-pointer group">
                   <div className="overflow-hidden">
                     <img
-                      src={product.images?.[0] || "/placeholder.jpg"}
+                      src={product.images?.[0] || PLACEHOLDER_IMAGE}
                       alt={product.name}
                       className="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-500"
                       loading="lazy"
@@ -141,7 +158,7 @@ export default function DisGiyimPage() {
                       {product.name}
                     </h3>
                     <p className="text-[#B39B4C] font-medium">
-                      ₺{product.price}
+                      {formatter.format(product.price)}
                     </p>
                   </div>
                 </div>
